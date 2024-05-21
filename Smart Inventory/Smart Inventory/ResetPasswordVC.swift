@@ -5,17 +5,41 @@
 //  Created by Harini Beeram on 5/21/24.
 //
 
+
 import UIKit
+import FirebaseAuth
 
 class ResetPasswordVC: UIViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
+    @IBOutlet weak var email: UITextField!
     
+    
+    
+    @IBAction func onSend(_ sender: UIButton) {
+        
+        
+        guard let email = email.text, !email.isEmpty else {
+                    showAlert(message: "Please enter your email address.")
+                    return
+                }
 
+                Auth.auth().sendPasswordReset(withEmail: email) { error in
+                    DispatchQueue.main.async {
+                        if let error = error {
+                            self.showAlert(message: "Error resetting password: \(error.localizedDescription)")
+                        } else {
+                            self.showAlert(message: "Reset email sent successfully.")
+                        }
+                    }
+                }
+            }
+
+            private func showAlert(message: String) {
+                let alert = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                present(alert, animated: true, completion: nil)
+            }
+        }
     /*
     // MARK: - Navigation
 
@@ -26,4 +50,4 @@ class ResetPasswordVC: UIViewController {
     }
     */
 
-}
+   
