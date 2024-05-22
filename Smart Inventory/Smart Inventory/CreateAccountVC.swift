@@ -8,6 +8,7 @@
 import UIKit
 import Firebase
 import FirebaseFirestore
+import Firebase
 import FirebaseAuth
 
 class CreateAccountVC: UIViewController {
@@ -21,6 +22,7 @@ class CreateAccountVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
        }
     
     @IBAction func onSignUp(_ sender: Any) {
