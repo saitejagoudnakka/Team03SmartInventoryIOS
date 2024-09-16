@@ -21,7 +21,9 @@ class ForgotPassword: BaseVC {
         }
         else{
             FireStoreManager.shared.getPassword(email: self.email.text!.lowercased(), password: "") { password in
-                self.forgotPassword(password: password)
+                let vc = self.storyboard?.instantiateViewController(withIdentifier:  "ChangePasswordVC" ) as! ChangePasswordVC
+                        
+                self.navigationController?.pushViewController(vc, animated: true)
             }
         }
     }

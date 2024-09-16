@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8055C56A2C92D37F00420E0F /* ChangePasswordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8055C5692C92D37F00420E0F /* ChangePasswordVC.swift */; };
 		8059771C2C8A0BDD0059315D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8059771B2C8A0BDD0059315D /* AppDelegate.swift */; };
 		8059771E2C8A0BDD0059315D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8059771D2C8A0BDD0059315D /* SceneDelegate.swift */; };
 		805977202C8A0BDD0059315D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8059771F2C8A0BDD0059315D /* ViewController.swift */; };
@@ -34,6 +35,10 @@
 		8059775A2C8A0DE70059315D /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 805977592C8A0DE70059315D /* FirebaseStorage */; };
 		8059775C2C8A0DE70059315D /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 8059775B2C8A0DE70059315D /* FirebaseStorageCombine-Community */; };
 		8059775F2C8A10E10059315D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8059775E2C8A10E10059315D /* GoogleService-Info.plist */; };
+		805BE60D2C90C527008EDF65 /* AddProductVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805BE60C2C90C527008EDF65 /* AddProductVC.swift */; };
+		805BE60F2C90C965008EDF65 /* InventoryProductVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805BE60E2C90C965008EDF65 /* InventoryProductVC.swift */; };
+		805BE6112C90C978008EDF65 /* ProductRequestLIstVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805BE6102C90C978008EDF65 /* ProductRequestLIstVC.swift */; };
+		805BE6142C90D1A2008EDF65 /* ProductModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 805BE6132C90D1A2008EDF65 /* ProductModel.swift */; };
 		80C6CBE42C8DDCEA00B9F2B1 /* BaseVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C6CBE32C8DDCEA00B9F2B1 /* BaseVC.swift */; };
 		80C6CBE82C8DF1D400B9F2B1 /* InventoryListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C6CBE72C8DF1D400B9F2B1 /* InventoryListVC.swift */; };
 		80C6CBEA2C8DF64800B9F2B1 /* UserHomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80C6CBE92C8DF64800B9F2B1 /* UserHomeVC.swift */; };
@@ -42,6 +47,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8055C5692C92D37F00420E0F /* ChangePasswordVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordVC.swift; sourceTree = "<group>"; };
 		805977182C8A0BDD0059315D /* SmartInventory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartInventory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8059771B2C8A0BDD0059315D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8059771D2C8A0BDD0059315D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -62,6 +68,10 @@
 		805977442C8A0CE80059315D /* SignUpVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUpVC.swift; sourceTree = "<group>"; };
 		805977482C8A0D2F0059315D /* ForgotPassword.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForgotPassword.swift; sourceTree = "<group>"; };
 		8059775E2C8A10E10059315D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		805BE60C2C90C527008EDF65 /* AddProductVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProductVC.swift; sourceTree = "<group>"; };
+		805BE60E2C90C965008EDF65 /* InventoryProductVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryProductVC.swift; sourceTree = "<group>"; };
+		805BE6102C90C978008EDF65 /* ProductRequestLIstVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductRequestLIstVC.swift; sourceTree = "<group>"; };
+		805BE6132C90D1A2008EDF65 /* ProductModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductModel.swift; sourceTree = "<group>"; };
 		80C6CBE32C8DDCEA00B9F2B1 /* BaseVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseVC.swift; sourceTree = "<group>"; };
 		80C6CBE72C8DF1D400B9F2B1 /* InventoryListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InventoryListVC.swift; sourceTree = "<group>"; };
 		80C6CBE92C8DF64800B9F2B1 /* UserHomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHomeVC.swift; sourceTree = "<group>"; };
@@ -109,6 +119,7 @@
 		8059771A2C8A0BDD0059315D /* SmartInventory */ = {
 			isa = PBXGroup;
 			children = (
+				805BE6122C90D192008EDF65 /* Model */,
 				805977412C8A0CD30059315D /* ViewController */,
 				805977332C8A0C460059315D /* Extension */,
 				805977382C8A0C460059315D /* FireBaseManager */,
@@ -155,6 +166,7 @@
 				805977442C8A0CE80059315D /* SignUpVC.swift */,
 				805977482C8A0D2F0059315D /* ForgotPassword.swift */,
 				80C6CBE32C8DDCEA00B9F2B1 /* BaseVC.swift */,
+				8055C5692C92D37F00420E0F /* ChangePasswordVC.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -164,6 +176,14 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		805BE6122C90D192008EDF65 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				805BE6132C90D1A2008EDF65 /* ProductModel.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		80C6CBE52C8DE4EF00B9F2B1 /* User */ = {
@@ -180,6 +200,9 @@
 			isa = PBXGroup;
 			children = (
 				80C6CBEB2C8DF83500B9F2B1 /* ManagerHomeVC.swift */,
+				805BE60C2C90C527008EDF65 /* AddProductVC.swift */,
+				805BE60E2C90C965008EDF65 /* InventoryProductVC.swift */,
+				805BE6102C90C978008EDF65 /* ProductRequestLIstVC.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -270,6 +293,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				805BE60D2C90C527008EDF65 /* AddProductVC.swift in Sources */,
 				80C6CBEE2C8DFC9E00B9F2B1 /* RequestVC.swift in Sources */,
 				805977472C8A0CE80059315D /* SignUpVC.swift in Sources */,
 				805977462C8A0CE80059315D /* InitialVC.swift in Sources */,
@@ -280,12 +304,16 @@
 				8059773E2C8A0C460059315D /* FireStoreManager.swift in Sources */,
 				805977402C8A0C460059315D /* UserDefaultsManager.swift in Sources */,
 				80C6CBEC2C8DF83500B9F2B1 /* ManagerHomeVC.swift in Sources */,
+				8055C56A2C92D37F00420E0F /* ChangePasswordVC.swift in Sources */,
 				8059773A2C8A0C460059315D /* ButtonWithShadow.swift in Sources */,
+				805BE6112C90C978008EDF65 /* ProductRequestLIstVC.swift in Sources */,
 				8059771C2C8A0BDD0059315D /* AppDelegate.swift in Sources */,
 				80C6CBE82C8DF1D400B9F2B1 /* InventoryListVC.swift in Sources */,
 				80C6CBEA2C8DF64800B9F2B1 /* UserHomeVC.swift in Sources */,
 				80C6CBE42C8DDCEA00B9F2B1 /* BaseVC.swift in Sources */,
 				8059773F2C8A0C460059315D /* ForgetPasswordManager.swift in Sources */,
+				805BE6142C90D1A2008EDF65 /* ProductModel.swift in Sources */,
+				805BE60F2C90C965008EDF65 /* InventoryProductVC.swift in Sources */,
 				8059771E2C8A0BDD0059315D /* SceneDelegate.swift in Sources */,
 				8059773C2C8A0C460059315D /* Extensions.swift in Sources */,
 				805977492C8A0D2F0059315D /* ForgotPassword.swift in Sources */,

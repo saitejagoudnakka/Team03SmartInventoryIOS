@@ -77,6 +77,7 @@ class FireStoreManager {
                 
                 for document in querySnapshot!.documents {
                     print("doclogin = \(document.documentID)")
+                    UserDefaultsManager.shared
                     UserDefaults.standard.setValue("\(document.documentID)", forKey: "documentId")
                     if let pwd = document.data()["password"] as? String{
                         completion(pwd)
@@ -149,5 +150,70 @@ class FireStoreManager {
                        completionHandler("success")
                    }
      }
+    }
+    
+    func addProductDetail(documentID: String, email: String, data: ProductModel,completionHandler: @escaping (Bool)->()) 
+    {
+//        let data = ["patientId": data.patientId ?? "",
+//                    "pFirstname": data.pFirstname ?? "",
+//                    "pLastname": data.pLastname ?? "",
+//                    "pMiddlename": data.pMiddlename ?? "",
+//                    "doctorName": data.doctorName ?? "",
+//                    "hospitalName": data.hospitalName ?? "",
+//                    "medicalEmergency": data.medicalEmergency ?? "",
+//                    "date": data.date ?? "",
+//                    "time": data.time ?? "",
+//                    "medicalHistory": data.medicalHistory ?? "",
+//                    "status": data.status ?? "",
+//                    "doctorEmail": data.doctorEmail ?? "",
+//                    "patientEmail": data.patientEmail ?? "",
+//                    "bookingDate": data.bookingDate ?? 0.0,
+//                    "documentId": data.documentId ?? ""] as [String : Any]
+//        let query = self.dbRef.document(UserDefaultsManager.shared.getDocumentId()).collection("Appoinments")
+//        query.document(appointDocumentID).updateData(data) { success in
+//                    return completionHandler(true)
+//        }
+
+    }
+    
+    func changePassword(documentid:String, userData: [String:String] ,completion: @escaping (Bool)->()) {
+        let  query = db.collection("Users").document(documentid)
+        
+        query.updateData(userData) { error in
+            if let error = error {
+                print("Error updating Firestore data: \(error.localizedDescription)")
+            } else {
+                print("Password updated successfully")
+                completion(true)
+            }
+        }
+    }
+    
+    func updateUserPasswordByEmail(email: String, newPassword: String,completion: @escaping (Bool)->()) {
+        self.dbRef.whereField("email", isEqualTo: email).getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                if let documents = querySnapshot?.documents, !documents.isEmpty {
+                    for document in documents {
+                        let documentRef = document.reference
+                        
+                        documentRef.updateData([
+                            "password": newPassword
+                        ]) { err in
+                            if let err = err {
+                                print("Error updating document: \(err)")
+                            } else {
+                                completion(true)
+                                print("Password updated successfully for user: \(email)")
+                            }
+                        }
+                    }
+                } else {
+                    completion(false)
+                    print("No user found with the email \(email)")
+                }
+            }
+        }
     }
 }
