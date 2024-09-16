@@ -957,7 +957,7 @@
                                             <constraint firstAttribute="height" constant="50" id="tlE-ks-saz"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
-                                        <state key="normal" title="Chedk-In Product">
+                                        <state key="normal" title="Check-In Product">
                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
