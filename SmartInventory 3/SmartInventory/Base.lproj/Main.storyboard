@@ -957,7 +957,7 @@
                                             <constraint firstAttribute="height" constant="50" id="tlE-ks-saz"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
-                                        <state key="normal" title="Chedk-In Product">
+                                        <state key="normal" title="Check-In Product">
                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
@@ -2573,6 +2573,7 @@
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="0QM-kL-H3s"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="n0K-Xq-XWF" secondAttribute="bottom" id="6CK-RR-Bj7"/>
@@ -2689,6 +2690,7 @@
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="J6V-H3-qvz"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="Mdo-sg-Jqa" secondAttribute="bottom" id="3eW-K1-oN6"/>
@@ -2805,6 +2807,7 @@
                                 </prototypes>
                             </tableView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="MQj-x2-0Jy"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="UFx-qH-0OU" firstAttribute="leading" secondItem="isS-Pl-9O0" secondAttribute="leading" id="09b-1x-yJn"/>
