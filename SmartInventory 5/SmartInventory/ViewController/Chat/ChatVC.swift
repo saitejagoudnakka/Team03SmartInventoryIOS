@@ -52,6 +52,55 @@ class ChatVC: UIViewController {
         }
     }
 
+    func setupMessageListener() {
+            let chatDbRef = FireStoreManager.shared.db.collection("Chat").document(chatID).collection("Messages")
+            
+            // Listen for new messages
+            chatDbRef.order(by: "dateSent", descending: false).addSnapshotListener { [weak self] snapshot, error in
+                guard let self = self else { return }
+                
+                if let error = error {
+                    print("Error listening for new messages: \(error)")
+                    return
+                }
+                
+                guard let snapshot = snapshot else { return }
+                
+                // Loop through document changes
+                for diff in snapshot.documentChanges {
+                    if diff.type == .added {
+                        // Create a MessageModel from the new message data
+                        let messageData = diff.document.data()
+                        let newMessage = MessageModel(data: messageData)
+                        
+                        // Add the new message to the messages array
+                        self.messages.append(newMessage)
+                        self.shortMessages()
+                        self.reloadData()
+                        
+                        // Display local notification if message is from another user
+                        if newMessage.sender != self.senderId {
+                            self.displayLocalNotification(for: newMessage)
+                        }
+                    }
+                }
+            }
+        }
+
+        func displayLocalNotification(for message: MessageModel) {
+            let content = UNMutableNotificationContent()
+            content.title = "New message from \(message.senderName)"
+            content.body = message.text
+            content.sound = .default
+
+            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+            
+            UNUserNotificationCenter.current().add(request) { error in
+                if let error = error {
+                    print("Error displaying local notification: \(error)")
+                }
+            }
+        }
 
  
   
@@ -138,6 +187,16 @@ extension ChatVC {
         super.viewDidLoad()
         tableView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.size.width - 10)
         self.chatContainer.dropShadow()
+        
+        
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                    if let error = error {
+                        print("Notification permission error: \(error)")
+                    }
+                }
+
+                // Set up the message listener
+                setupMessageListener()
        
         self.setTableView()
         self.setNameAndTitle()
