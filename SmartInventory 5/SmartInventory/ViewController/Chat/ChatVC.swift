@@ -273,6 +273,7 @@ struct MessageModel {
     var chatId: String
     var text: String
     var senderName: String
+    //var isRead: Bool
     
     // Add an initializer to create a MessageModel from Firestore data
     init(data: [String: Any]) {
@@ -282,7 +283,7 @@ struct MessageModel {
         self.text = data["text"] as? String ?? ""
         self.senderName = data["senderName"] as? String ?? ""
     }
-    
+
     func getDate() -> Date {
         Date(timeIntervalSince1970: dateSent)
     }
@@ -356,6 +357,8 @@ extension FireStoreManager {
 //            completionHandler(documents, nil)
 //        }
 //    }
+    
+
     
     
     func getChatList(userEmail: String, completionHandler: @escaping ([QueryDocumentSnapshot]?, Error?) -> Void) {
