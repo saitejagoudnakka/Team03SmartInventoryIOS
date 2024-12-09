@@ -73,8 +73,13 @@ extension ProductRequestLIstVC {
         self.rejectUpdateAppointment(status: "Reject", requestData: request)
     }
     
-    func updateAppointment(status: String, requestData: RequestModel!){
-        FireStoreManager.shared.acceptProductRequest(documentid: UserDefaultsManager.shared.getDocumentId(), warehouseID: requestData.warehouseID ?? "", UPC: requestData.upcNumber ?? "", userid: requestData.userid ?? "", productName: requestData.productname ?? "", request: requestData) { success in
+    func updateAppointment(status: String, requestData: RequestModel!) {
+        
+        var mutableRequestData = requestData
+        mutableRequestData?.approved_time = Int(Date().timeIntervalSince1970)
+        mutableRequestData?.checkOutDate = Date()
+
+        FireStoreManager.shared.acceptProductRequest(documentid: UserDefaultsManager.shared.getDocumentId(), warehouseID: requestData.warehouseID ?? "", UPC: requestData.upcNumber ?? "", userid: requestData.userid ?? "", productName: requestData.productname ?? "" ,request: mutableRequestData!) { success in
                         if success {
                             showAlerOnTop(message: "Product Accepted!!")
                             self.navigationController?.popViewController(animated: true)
@@ -83,8 +88,12 @@ extension ProductRequestLIstVC {
     }
     
     
-    func rejectUpdateAppointment(status: String, requestData: RequestModel!){
-        FireStoreManager.shared.rejectProductRequest(documentid: UserDefaultsManager.shared.getDocumentId(), warehouseID: requestData.warehouseID ?? "", UPC: requestData.upcNumber ?? "", userid: requestData.userid ?? "", productName: requestData.productname ?? "", request: requestData) { success in
+    func rejectUpdateAppointment(status: String, requestData: RequestModel!) {
+        
+        var mutableRequestData = requestData
+        mutableRequestData?.approved_time = Int(Date().timeIntervalSince1970)
+
+        FireStoreManager.shared.rejectProductRequest(documentid: UserDefaultsManager.shared.getDocumentId(), warehouseID: requestData.warehouseID ?? "", UPC: requestData.upcNumber ?? "", userid: requestData.userid ?? "", productName: requestData.productname ?? "", request: mutableRequestData!) { success in
                         if success {
                             showAlerOnTop(message: "Product Rejected!!")
                             self.navigationController?.popViewController(animated: true)

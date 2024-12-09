@@ -64,7 +64,7 @@ class AddProductVC: BaseVC,UIPickerViewDelegate, UIPickerViewDataSource  {
         if validate(){
             let price = AddProductVC.getRandomPrice(min: 100.0, max: 500.0)
             let productPriceString = String(format: "$%.2f", price)
-            self.updateProductData(data: RequestModel(productname: self.productNameTxt.text ?? "", warehouseID: self.warehouseidTxt.text ?? "", upcNumber: self.upcTxt.text ?? "", quantity: self.quantityTxt.text ?? "", shippingFile: "", userid: "", managerid: UserDefaultsManager.shared.getDocumentId(), requestId: "", category: self.categoryTxt.text ?? "", availableQuantity: self.quantityTxt.text ?? "", managerEmail: UserDefaultsManager.shared.getEmail(), userEmail: "", price: productPriceString, paymentStatus: "pending", trackingNumber: self.trackingNumberTxt.text ?? "", status_accepted_rejected: "", packageStatus: ""))
+            self.updateProductData(data: RequestModel(productname: self.productNameTxt.text ?? "", warehouseID: UserDefaultsManager.shared.getUserWarehouseId(), upcNumber: self.upcTxt.text ?? "", quantity: self.quantityTxt.text ?? "", shippingFile: "", userid: self.userIdTxt.text ?? "", managerid: UserDefaultsManager.shared.getDocumentId(), requestId: "", category: self.categoryTxt.text ?? "", availableQuantity: self.quantityTxt.text ?? "", managerEmail: UserDefaultsManager.shared.getEmail(), userEmail: "", price: productPriceString, paymentStatus: "pending", trackingNumber: self.trackingNumberTxt.text ?? "", status_accepted_rejected: "", packageStatus: "", added_time: Int(Date().timeIntervalSince1970), approved_time: 0))
         }
     }
     
@@ -153,7 +153,7 @@ class AddProductVC: BaseVC,UIPickerViewDelegate, UIPickerViewDataSource  {
 
 extension AddProductVC {
     func updateProductData(data: RequestModel){
-        FireStoreManager.shared.addProductDetail(wareHouseId: self.warehouseidTxt.text ?? "", product: data) { success in
+        FireStoreManager.shared.addProductDetail(wareHouseId: UserDefaultsManager.shared.getUserWarehouseId(), product: data) { success in
             if success{
                 showOkAlertAnyWhereWithCallBack(message: "Product added successfully") {
                         self.navigationController?.popToRootViewController(animated: true)

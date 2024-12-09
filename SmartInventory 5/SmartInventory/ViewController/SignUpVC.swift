@@ -15,11 +15,17 @@ class SignUpVC: BaseVC {
     
     @IBAction func onSignUp(_ sender: Any) {
         if validate(){
-            FireStoreManager.shared.signUp(email: self.email.text?.lowercased() ?? "", password: self.password.text ?? "", userType: userType)
+            let warehouseid = generateFourDigitRandomNumber()
+            FireStoreManager.shared.signUp(email: self.email.text?.lowercased() ?? "", password: self.password.text ?? "", userType: userType, warehouseid: String(warehouseid))
         }
         
     }
 
+    func generateFourDigitRandomNumber() -> Int {
+        return Int.random(in: 1000...9999)
+    }
+
+    
     @IBAction func onLogin(_ sender: Any) {
         self.navigationController?.popToRootViewController(animated: true)
     }

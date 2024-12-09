@@ -62,37 +62,28 @@ class RequestVC: BaseVC, UIImagePickerControllerDelegate, UINavigationController
     
     @IBAction func uploadFileAction(_ sender: Any) {
         
-        let actionSheet = UIAlertController(title: "Choose Option", message: nil, preferredStyle: .actionSheet)
-        
-        let chooseImageAction = UIAlertAction(title: "Choose Image", style: .default) { [weak self] _ in
-            self?.openImagePicker()
-        }
-        
-        let chooseDocumentAction = UIAlertAction(title: "Choose Document", style: .default) { [weak self] _ in
-            self?.openDocumentPicker()
-        }
-        
-        // Add a cancel action
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        
-        actionSheet.addAction(chooseImageAction)
-        actionSheet.addAction(chooseDocumentAction)
-        actionSheet.addAction(cancelAction)
-        
-        // Present the action sheet
-        if let popoverController = actionSheet.popoverPresentationController {
-            popoverController.sourceView = sender as! UIView
-            popoverController.sourceRect = (sender as AnyObject).bounds
-        }
-        
-        present(actionSheet, animated: true, completion: nil)
+        self.openDocumentPicker()
+
+//        let actionSheet = UIAlertController(title: "Choose Option", message: nil, preferredStyle: .actionSheet)
+//      
+//        let chooseDocumentAction = UIAlertAction(title: "Choose Document", style: .default) { [weak self] _ in
+//        }
+//        
+//        // Add a cancel action
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+//        
+//        actionSheet.addAction(chooseDocumentAction)
+//        actionSheet.addAction(cancelAction)
+//        
+//        // Present the action sheet
+//        if let popoverController = actionSheet.popoverPresentationController {
+//            popoverController.sourceView = sender as! UIView
+//            popoverController.sourceRect = (sender as AnyObject).bounds
+//        }
+//        
+//        present(actionSheet, animated: true, completion: nil)
     }
     
-    
-    func openImagePicker(){
-        docImageBool = false
-        present(imagePicker, animated: true, completion: nil)
-    }
     
     func openDocumentPicker(){
         docImageBool = true
@@ -241,7 +232,7 @@ extension RequestVC{
     }
     
     func uploadRequestToFirestore(fileUrl: String){
-        let requestModel = RequestModel(productname: self.productNameTxt.text ?? "", warehouseID: self.warehouseIdTxt.text ?? "", upcNumber: self.upcTxt.text ?? "", quantity: self.quantityTxt.text ?? "", shippingFile: fileUrl, userid: UserDefaultsManager.shared.getDocumentId(), managerid: self.productData?.managerid ?? "", requestId: "\(self.productData?.productname ?? "")-\(self.productData?.upcNumber ?? "")-\(self.quantityTxt.text ?? "")-\(UserDefaultsManager.shared.getDocumentId())", category: self.productData?.category ?? "", availableQuantity: self.productData?.availableQuantity ?? "",managerEmail: self.productData?.managerEmail ?? "", userEmail: UserDefaultsManager.shared.getEmail(), price: self.productData?.price ?? "20.0", paymentStatus: self.productData?.paymentStatus ?? "", trackingNumber: "", status_accepted_rejected: "", packageStatus: "")
+        let requestModel = RequestModel(productname: self.productNameTxt.text ?? "", warehouseID: self.warehouseIdTxt.text ?? "", upcNumber: self.upcTxt.text ?? "", quantity: self.quantityTxt.text ?? "", shippingFile: fileUrl, userid: UserDefaultsManager.shared.getDocumentId(), managerid: self.productData?.managerid ?? "", requestId: "\(self.productData?.productname ?? "")-\(self.productData?.upcNumber ?? "")-\(self.quantityTxt.text ?? "")-\(UserDefaultsManager.shared.getDocumentId())", category: self.productData?.category ?? "", availableQuantity: self.productData?.availableQuantity ?? "",managerEmail: self.productData?.managerEmail ?? "", userEmail: UserDefaultsManager.shared.getEmail(), price: self.productData?.price ?? "20.0", paymentStatus: self.productData?.paymentStatus ?? "", trackingNumber: self.productData?.trackingNumber ?? "", status_accepted_rejected: "", packageStatus: "", added_time:  Int(Date().timeIntervalSince1970), approved_time: self.productData?.approved_time ?? 0, checkInDate: Date())
         
         FireStoreManager.shared.addProductRequest(warehouseID: self.warehouseIdTxt.text ?? "", UPC: self.upcTxt.text ?? "", request: requestModel) { success in
             if success{

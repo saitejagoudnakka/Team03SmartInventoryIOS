@@ -1,7 +1,13 @@
+//
+//  PackageListVC.swift
+//  SmartInventory
+//
+//  Created by Deepika Kunwar on 19/11/24.
+//
 
 import UIKit
 
-class InventoryListVC: BaseVC,UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
+class PackageListVC: BaseVC,UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
     
@@ -16,14 +22,16 @@ class InventoryListVC: BaseVC,UITableViewDelegate, UITableViewDataSource, UISear
         self.tableView.delegate = self
         self.tableView.dataSource = self
         
-        FireStoreManager.shared.getAllWarehouseProducts { [weak self] productsArray in
-                guard let self = self else { return }
-                if let productsArray = productsArray {
-                    self.products = productsArray.sorted { $0.added_time > $1.added_time }
-                    self.tableView.reloadData()
-                }
-            }
-    }
+            FireStoreManager.shared.getAllRequestProductRecord(forUserId: UserDefaultsManager.shared.getDocumentId(), collectionStatus: "AcceptedProductRequest") { [weak self] fetchedProducts, error in
+                  if let error = error {
+                      print("Error fetching products: \(error.localizedDescription)")
+                  } else if let fetchedProducts = fetchedProducts {
+                      self?.products = fetchedProducts.sorted { $0.added_time > $1.added_time }
+                      self?.tableView.reloadData()
+                  }
+              }
+          }
+    
     
     private func setupSearchBar() {
            searchBar.delegate = self
@@ -35,7 +43,7 @@ class InventoryListVC: BaseVC,UITableViewDelegate, UITableViewDataSource, UISear
 }
 
 
-extension InventoryListVC {
+extension PackageListVC {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -50,14 +58,19 @@ extension InventoryListVC {
         let data = isSearching ? filteredProducts[indexPath.row] : products[indexPath.row]
         
         cell.productName.text = "Product Name: \(data.productname ?? "")"
-        cell.quantity.text = "Quantity: \(data.quantity ?? "")"
-        cell.userid.text = "Warehouse Id: \(data.warehouseID ?? "")"
+        
+        let added_time = PackageListVC.formatDateTime(date: data.checkInDate)
+        cell.quantity.text = "Check-In: \(added_time)"
+                
+        let approved_time = PackageListVC.formatDateTime(date: data.checkOutDate)
+        cell.userid.text = "Check-Out: \(approved_time)"
         
         cell.acceptBtn.layer.borderColor = UIColor(hex: "183F62").cgColor
         cell.acceptBtn.layer.borderWidth = 1.0
         cell.acceptBtn.layer.cornerRadius = 10.0
         
-        cell.acceptBtn.setTitle("UPC number: \(data.upcNumber ?? "")", for: .normal)
+        cell.acceptBtn.setTitle("Package Id: \(data.trackingNumber ?? "")", for: .normal)
+        
         cell.acceptBtn.tag = indexPath.row
         cell.acceptBtn.addTarget(self, action: #selector(openRaiseRequest(_:)), for: .touchUpInside)
         return cell
@@ -70,7 +83,7 @@ extension InventoryListVC {
     @objc func openRaiseRequest(_ sender: UIButton) {
         let data = isSearching ? filteredProducts[sender.tag] : products[sender.tag]
 
-        let vc = self.storyboard?.instantiateViewController(withIdentifier:  "RequestVC" ) as! RequestVC
+        let vc = self.storyboard?.instantiateViewController(withIdentifier:  "PackageDetailVC" ) as! PackageDetailVC
         vc.productData = data
         self.navigationController?.pushViewController(vc, animated: true)
     }
@@ -83,7 +96,7 @@ extension InventoryListVC {
            } else {
                isSearching = true
                filteredProducts = products.filter { product in
-                   return product.productname!.lowercased().contains(searchText.lowercased()) || product.quantity!.contains(searchText) || product.upcNumber!.contains(searchText) || product.warehouseID!.contains(searchText)
+                   return product.productname!.lowercased().contains(searchText.lowercased()) || product.trackingNumber!.contains(searchText)
                    
                }
            }
@@ -98,6 +111,19 @@ extension InventoryListVC {
            searchBar.resignFirstResponder()
        }
 
+    
+    static func formatDateTime(date: Date?) -> String {
+        guard let date = date else {
+            return "Pending" // Default value when the date is nil
+        }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd, yyyy - hh:mm a" // Customize the format as needed
+        formatter.locale = Locale.current
+        return formatter.string(from: date)
+    }
+
+
+    
 }
 
 

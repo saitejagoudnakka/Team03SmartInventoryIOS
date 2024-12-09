@@ -15,6 +15,7 @@ class TableViewCell: UITableViewCell {
     @IBOutlet weak var datelbl: UILabel!
     @IBOutlet weak var userid: UILabel!
     @IBOutlet weak var acceptBtn: UIButton!
+    @IBOutlet weak var payBtn: UIButton!
     @IBOutlet weak var rejectBtn: UIButton!
     @IBOutlet weak var useridum: UILabel!
     @IBOutlet weak var price: UILabel!

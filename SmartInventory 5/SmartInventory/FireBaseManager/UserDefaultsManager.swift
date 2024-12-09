@@ -41,14 +41,25 @@ class UserDefaultsManager  {
        return UserDefaults.standard.string(forKey: "userType") ?? ""
     }
     
+    func getUserId()-> String {
+       return UserDefaults.standard.string(forKey: "userid") ?? ""
+    }
+    
     func getDocumentId()-> String {
        return UserDefaults.standard.string(forKey: "documentId") ?? ""
     }
     
-    func saveData(email:String, userType: String) {
+    func getUserWarehouseId()-> String {
+       return UserDefaults.standard.string(forKey: "userWarehouseId") ?? ""
+    }
+    
+    func saveData(email:String, userType: String, userWarehouseId: String,userId:String) {
+    
         
         UserDefaults.standard.setValue(email, forKey: "email")
         UserDefaults.standard.setValue(userType, forKey: "userType")
+        UserDefaults.standard.setValue(userWarehouseId, forKey: "userWarehouseId")
+        UserDefaults.standard.setValue(userId, forKey: "userid")
     }
   
     func clearData(){

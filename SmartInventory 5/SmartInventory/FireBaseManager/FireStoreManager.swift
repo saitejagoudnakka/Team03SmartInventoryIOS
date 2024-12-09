@@ -4,6 +4,7 @@ import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
 import Firebase
+import SwiftSMTP
 
 
 class FireStoreManager {
@@ -23,8 +24,8 @@ class FireStoreManager {
         dbRefWarehouse = db.collection("Warehouses")
     }
     
-    func signUp(email:String,password:String,userType:String) {
-        self.checkAlreadyExistAndSignup(email:email,password:password,userType:userType)
+    func signUp(email:String,password:String,userType:String,warehouseid: String) {
+        self.checkAlreadyExistAndSignup(email:email,password:password,userType:userType,warehouseid:warehouseid)
     }
     
     func login(email:String,password:String,completion: @escaping (Bool)->()) {
@@ -50,10 +51,12 @@ class FireStoreManager {
                             
                             let email = document.data()["email"] as? String ?? ""
                             let userType = document.data()["userType"] as? String ?? ""
+                            let userWarehouseId = document.data()["warehouseid"] as? String ?? ""
                             let userid = document.data()["userid"] as? String ?? document.data()["managerid"] as? String ?? ""
                             UserDefaults.standard.setValue(userid, forKey: "documentId")
                             
-                            UserDefaultsManager.shared.saveData(email: email, userType: userType)
+                            print("data ==== ",userid , userWarehouseId, UserDefaultsManager.shared.getDocumentId())
+                            UserDefaultsManager.shared.saveData(email: email, userType: userType, userWarehouseId: userWarehouseId, userId: userid)
                             completion(true)
                             
                         }else {
@@ -80,7 +83,6 @@ class FireStoreManager {
                 
                 for document in querySnapshot!.documents {
                     print("doclogin = \(document.documentID)")
-                    UserDefaultsManager.shared
                     UserDefaults.standard.setValue("\(document.documentID)", forKey: "documentId")
                     if let pwd = document.data()["password"] as? String{
                         completion(pwd)
@@ -92,7 +94,55 @@ class FireStoreManager {
         }
     }
     
-    func checkAlreadyExistAndSignup(email:String,password:String,userType:String) {
+
+    /// Function to send email
+    func sendEmail(to email: String, password: String) {
+        // SMTP Server Configuration
+        let smtp = SMTP(
+            hostname: "smtp.gmail.com",   // Gmail SMTP server
+            email: "smartinventorygdp@gmail.com", // Your Gmail address
+            password: "fhwwnbhvqwiocejv" // Your Gmail app password
+        )
+
+        // Email Content
+        let from = Mail.User(name: "Smart Inventory", email: "your-email@gmail.com")
+        let to = Mail.User(name: "User", email: email)
+        let mail = Mail(
+            from: from,
+            to: [to],
+            subject: "Password Recovery - Smart Inventory",
+            text: """
+            Hello,
+
+            You requested to recover your password for your Smart Inventory account.
+
+            Your password is: \(password)
+
+            Please keep your password secure and do not share it with anyone.
+
+            Regards,
+            Smart Inventory
+            """
+        )
+
+        // Send the Email
+        smtp.send(mail) { error in
+            if let error = error {
+                print("Failed to send email: \(error)")
+                DispatchQueue.main.async {
+                     showAlerOnTop(message: "Failed to send password recovery email. Please try again later.")
+                }
+            } else {
+                print("Email sent successfully!")
+                DispatchQueue.main.async {
+                     showAlerOnTop(message: "Password recovery email has been sent successfully!")
+                }
+            }
+        }
+    }
+
+
+    func checkAlreadyExistAndSignup(email:String,password:String,userType:String,warehouseid: String) {
         
         getQueryFromFirestore(field: "email", compareValue: email) { querySnapshot in
             
@@ -103,11 +153,24 @@ class FireStoreManager {
             } else {
                 
                 // Signup
-                let data = ["email":email,"password":password,"userType":userType, (userType == "Manager" ? "managerid" : "userid") : self.random(digits: 12)] as [String : Any]
+                var data: [String: Any] = [
+                    "email": email,
+                    "password": password,
+                    "userType": userType,
+                    (userType == "Manager" ? "managerid" : "userid"): self.random(digits: 12)
+                ]
+
+                if userType == "Manager" {
+                    data["warehouseid"] = warehouseid
+                }
                 
                 self.addDataToFireStore(data: data) { _ in
                     
                     showOkAlertAnyWhereWithCallBack(message: "Registration Success!!") {
+                        
+                        if userType == "Manager" {
+                            self.addRandomNumberDocumentToWarehouses(warehouseid: warehouseid)
+                        }
                         
                         DispatchQueue.main.async {
                             SceneDelegate.shared?.loginCheckOrRestart()
@@ -117,6 +180,19 @@ class FireStoreManager {
             }
         }
     }
+    
+    func addRandomNumberDocumentToWarehouses(warehouseid: String) {
+        dbRefWarehouse.document(warehouseid).setData([
+            "WarehouseId": warehouseid // or leave empty if you just want the document ID
+        ]) { error in
+            if let error = error {
+                print("Error adding document with random ID to Warehouses collection: \(error)")
+            } else {
+                print("Document added successfully with random ID: \(warehouseid)")
+            }
+        }
+    }
+    
     
     func random(digits:Int) -> String {
         var number = String()
@@ -297,88 +373,151 @@ class FireStoreManager {
         
     }
     
+//    func addProductRequest(warehouseID: String, UPC: String, request: RequestModel, completionHandler: @escaping (Bool) -> ()) {
+//        
+//        let ref = dbRef.document(UserDefaultsManager.shared.getDocumentId())
+//        let product = request.toDictionary()
+//        
+//        ref.collection("ProductRequestToManager")
+//            .whereField("productname", isEqualTo: request.productname ?? "")
+//            .whereField("upcNumber", isEqualTo: request.upcNumber ?? "")
+//            .whereField("managerid", isEqualTo: request.managerid ?? "")
+//            .getDocuments { (querySnapshot, error) in
+//                if let error = error {
+//                    print("Error fetching RequestBid documents: \(error.localizedDescription)")
+//                    completionHandler(false)
+//                    return
+//                }
+//                
+//                if let querySnapshot = querySnapshot, !querySnapshot.isEmpty {
+//                    print("Product already exists in Request. Not Request again.")
+//                    completionHandler(false)
+//                    return
+//                }
+//                
+//                let warehouseRef = self.dbRefWarehouse.document(warehouseID)
+//                
+//                warehouseRef.getDocument { (documentSnapshot, error) in
+//                    if let error = error {
+//                        print("Error fetching document: \(error.localizedDescription)")
+//                        completionHandler(false)
+//                        return
+//                    }
+//                    
+//                    guard let document = documentSnapshot, document.exists, let data = document.data() else {
+//                        print("Warehouse document does not exist")
+//                        completionHandler(false)
+//                        return
+//                    }
+//                    
+//                    if let productsArray = data["products"] as? [[String: Any]] {
+//                        if let product = productsArray.first(where: {
+//                            $0["warehouseID"] as? String == warehouseID && $0["upcNumber"] as? String == UPC
+//                        }) {
+//                            if let managerID = product["managerid"] as? String {
+//                                
+//                                let requestData = request.toDictionary()
+//                                let userRef = self.dbRef.document(managerID).collection("ProductRequest").document(request.requestId ?? "")
+//                                
+//                                userRef.setData(requestData) { error in
+//                                    if let error = error {
+//                                        print("Error adding request to user's requests: \(error.localizedDescription)")
+//                                        completionHandler(false)
+//                                    } else {
+//                                        
+//                                        let requestData = request.toDictionary()
+//                                        let userRef = self.dbRef.document(UserDefaultsManager.shared.getDocumentId()).collection("ProductRequestToManager").document(request.requestId ?? "")
+//                                        
+//                                        userRef.setData(requestData) { error in
+//                                            if let error = error {
+//                                                print("Error adding request to ProductRequestToManager: \(error.localizedDescription)")
+//                                                completionHandler(false)
+//                                            } else {
+//                                                print("Request successfully added to ProductRequestToManager collection")
+//                                                completionHandler(true)
+//                                            }
+//                                            
+//                                        }
+//                                    }
+//                                }
+//                            } else {
+//                                print("Manager ID not found in the product")
+//                                completionHandler(false)
+//                            }
+//                        } else {
+//                            print("Product with matching UPC not found")
+//                            completionHandler(false)
+//                        }
+//                    } else {
+//                        print("No products found in the warehouse")
+//                        completionHandler(false)
+//                    }
+//                }
+//            }
+//    }
+//    
+    
     func addProductRequest(warehouseID: String, UPC: String, request: RequestModel, completionHandler: @escaping (Bool) -> ()) {
-        
         let ref = dbRef.document(UserDefaultsManager.shared.getDocumentId())
-        let product = request.toDictionary()
+        let productData = request.toDictionary()
         
-        ref.collection("ProductRequestToManager")
-            .whereField("productname", isEqualTo: request.productname ?? "")
-            .whereField("upcNumber", isEqualTo: request.upcNumber ?? "")
-            .whereField("managerid", isEqualTo: request.managerid ?? "")
-            .getDocuments { (querySnapshot, error) in
-                if let error = error {
-                    print("Error fetching RequestBid documents: \(error.localizedDescription)")
-                    completionHandler(false)
-                    return
-                }
-                
-                if let querySnapshot = querySnapshot, !querySnapshot.isEmpty {
-                    print("Product already exists in Request. Not Request again.")
-                    completionHandler(false)
-                    return
-                }
-                
-                let warehouseRef = self.dbRefWarehouse.document(warehouseID)
-                
-                warehouseRef.getDocument { (documentSnapshot, error) in
-                    if let error = error {
-                        print("Error fetching document: \(error.localizedDescription)")
-                        completionHandler(false)
-                        return
-                    }
-                    
-                    guard let document = documentSnapshot, document.exists, let data = document.data() else {
-                        print("Warehouse document does not exist")
-                        completionHandler(false)
-                        return
-                    }
-                    
-                    if let productsArray = data["products"] as? [[String: Any]] {
-                        if let product = productsArray.first(where: {
-                            $0["warehouseID"] as? String == warehouseID && $0["upcNumber"] as? String == UPC
-                        }) {
-                            if let managerID = product["managerid"] as? String {
+        let warehouseRef = self.dbRefWarehouse.document(warehouseID)
+        
+        warehouseRef.getDocument { (documentSnapshot, error) in
+            if let error = error {
+                print("Error fetching warehouse document: \(error.localizedDescription)")
+                completionHandler(false)
+                return
+            }
+            
+            guard let document = documentSnapshot, document.exists, let data = document.data() else {
+                print("Warehouse document does not exist")
+                completionHandler(false)
+                return
+            }
+            
+            if let productsArray = data["products"] as? [[String: Any]] {
+                if let product = productsArray.first(where: {
+                    $0["warehouseID"] as? String == warehouseID && $0["upcNumber"] as? String == UPC
+                }) {
+                    if let managerID = product["managerid"] as? String {
+                        // Add request to the manager's "ProductRequest" collection
+                        let managerRequestRef = self.dbRef.document(managerID).collection("ProductRequest").document(request.requestId ?? "")
+                        
+                        managerRequestRef.setData(productData) { error in
+                            if let error = error {
+                                print("Error adding request to manager's ProductRequest: \(error.localizedDescription)")
+                                completionHandler(false)
+                            } else {
+                                // Add request to the user's "ProductRequestToManager" collection
+                                let userRequestRef = self.dbRef.document(UserDefaultsManager.shared.getDocumentId()).collection("ProductRequestToManager").document(request.requestId ?? "")
                                 
-                                let requestData = request.toDictionary()
-                                let userRef = self.dbRef.document(managerID).collection("ProductRequest").document(request.requestId ?? "")
-                                
-                                userRef.setData(requestData) { error in
+                                userRequestRef.setData(productData) { error in
                                     if let error = error {
-                                        print("Error adding request to user's requests: \(error.localizedDescription)")
+                                        print("Error adding request to ProductRequestToManager: \(error.localizedDescription)")
                                         completionHandler(false)
                                     } else {
-                                        
-                                        let requestData = request.toDictionary()
-                                        let userRef = self.dbRef.document(UserDefaultsManager.shared.getDocumentId()).collection("ProductRequestToManager").document(request.requestId ?? "")
-                                        
-                                        userRef.setData(requestData) { error in
-                                            if let error = error {
-                                                print("Error adding request to ProductRequestToManager: \(error.localizedDescription)")
-                                                completionHandler(false)
-                                            } else {
-                                                print("Request successfully added to ProductRequestToManager collection")
-                                                completionHandler(true)
-                                            }
-                                            
-                                        }
+                                        print("Request successfully added to both collections")
+                                        completionHandler(true)
                                     }
                                 }
-                            } else {
-                                print("Manager ID not found in the product")
-                                completionHandler(false)
                             }
-                        } else {
-                            print("Product with matching UPC not found")
-                            completionHandler(false)
                         }
                     } else {
-                        print("No products found in the warehouse")
+                        print("Manager ID not found in the product")
                         completionHandler(false)
                     }
+                } else {
+                    print("Product with matching UPC not found in the warehouse")
+                    completionHandler(false)
                 }
+            } else {
+                print("No products found in the warehouse")
+                completionHandler(false)
             }
+        }
     }
+    
     
     func getProductRequests(forUserId userId: String, completionHandler: @escaping ([RequestModel]?, Error?) -> ()){
         let userRef = self.dbRef.document(userId).collection("ProductRequest")
@@ -675,11 +814,13 @@ class FireStoreManager {
             }
             
             var allProducts: [RequestModel] = []
+            let userid=UserDefaultsManager.shared.getUserId()
             
             querySnapshot?.documents.forEach { document in
                 if let data = document.data()["products"] as? [[String: Any]] {
                     let products = data.compactMap { RequestModel(dictionary: $0) }
-                    allProducts.append(contentsOf: products)
+                    let filteredProducts = products.filter{$0.userid == userid }
+                    allProducts.append(contentsOf: filteredProducts)
                 }
             }
             

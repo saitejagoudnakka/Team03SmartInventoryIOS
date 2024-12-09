@@ -35,7 +35,6 @@ class LoginVC: UIViewController {
                     print("userType",userType)
                     SceneDelegate.shared?.loginCheckOrRestart()
                 }
-                
             }
         }
     }

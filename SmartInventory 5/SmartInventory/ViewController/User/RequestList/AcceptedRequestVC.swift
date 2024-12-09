@@ -58,8 +58,18 @@ extension AcceptedRequestVC {
         cell.acceptBtn.tag = indexPath.row
         cell.acceptBtn.addTarget(self, action: #selector(self.acceptAppointmentStatus(_:)), for: .touchUpInside)
 
-        
+        cell.payBtn.tag = indexPath.row
+        cell.payBtn.addTarget(self, action: #selector(self.paymentDetailStatus(_:)), for: .touchUpInside)
+
+
         return cell
+    }
+    
+    @objc func paymentDetailStatus(_ sender: UIButton) {
+        let vc = self.storyboard?.instantiateViewController(withIdentifier: "ProductDetailVC") as! ProductDetailVC
+        vc.productRecord = productsRequest[sender.tag]
+        vc.showPayBtn = true
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func acceptAppointmentStatus(_ sender: UIButton) {
@@ -77,9 +87,5 @@ extension AcceptedRequestVC {
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let vc = self.storyboard?.instantiateViewController(withIdentifier: "ProductDetailVC") as! ProductDetailVC
-        vc.productRecord = productsRequest[indexPath.row]
-        vc.showPayBtn = true
-        self.navigationController?.pushViewController(vc, animated: true)
     }
 }

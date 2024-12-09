@@ -191,7 +191,7 @@ class PackageStatusView: UIView {
     
     var optionSelected: ((String) -> Void)?
     
-    private let options = ["Processing", "Packed", "Shipped", "Out for Delivery", "Delivered"]
+    private let options = ["Pending", "Approved", "Rejected"]
     
     override init(frame: CGRect) {
         super.init(frame: frame)

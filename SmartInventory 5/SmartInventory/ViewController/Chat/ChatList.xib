@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -21,7 +22,7 @@
                         <rect key="frame" x="10" y="10" width="469.66666666666669" height="146"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="person.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="lmo-7G-gbj">
-                                <rect key="frame" x="10" y="6" width="70" height="68.666666666666671"/>
+                                <rect key="frame" x="10" y="5.6666666666666643" width="70" height="68.666666666666686"/>
                                 <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="70" id="9y9-JM-yXc"/>
@@ -32,23 +33,48 @@
                                 <rect key="frame" x="90.000000000000028" y="10" width="369.66666666666674" height="126"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Email" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5s7-e8-vkh" userLabel="Pickup Date">
-                                        <rect key="frame" x="0.0" y="0.0" width="369.66666666666669" height="30.666666666666668"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="369.66666666666669" height="26.333333333333332"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Message" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bgL-3a-9Gu" userLabel="Pickup Date">
-                                        <rect key="frame" x="0.0" y="40.666666666666664" width="369.66666666666669" height="30.666666666666664"/>
+                                        <rect key="frame" x="0.0" y="36.333333333333343" width="369.66666666666669" height="49.666666666666657"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4UG-GB-SOR" userLabel="Pickup Date">
-                                        <rect key="frame" x="0.0" y="81.333333333333329" width="369.66666666666669" height="44.666666666666671"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                        <nil key="textColor"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="M7v-fS-3z0">
+                                        <rect key="frame" x="0.0" y="96" width="369.66666666666669" height="30"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QW0-D7-tBl" userLabel="Pickup Date">
+                                                <rect key="frame" x="0.0" y="0.0" width="339.66666666666669" height="30"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3WN-oi-hZ0">
+                                                <rect key="frame" x="339.66666666666669" y="0.0" width="30" height="30"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="89" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f3m-uw-fhU" userLabel="Pickup Date">
+                                                        <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
+                                                <color key="backgroundColor" red="0.094117647060000004" green="0.2470588235" blue="0.38431372549999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="30" id="Af4-6z-EKc"/>
+                                                    <constraint firstAttribute="bottom" secondItem="f3m-uw-fhU" secondAttribute="bottom" id="KeZ-pK-cCU"/>
+                                                    <constraint firstAttribute="height" constant="30" id="Qoh-A3-zQn"/>
+                                                    <constraint firstItem="f3m-uw-fhU" firstAttribute="leading" secondItem="3WN-oi-hZ0" secondAttribute="leading" id="XEK-Iy-97U"/>
+                                                    <constraint firstItem="f3m-uw-fhU" firstAttribute="top" secondItem="3WN-oi-hZ0" secondAttribute="top" id="chJ-ig-emj"/>
+                                                    <constraint firstAttribute="trailing" secondItem="f3m-uw-fhU" secondAttribute="trailing" id="nHH-1m-4Ye"/>
+                                                </constraints>
+                                            </view>
+                                        </subviews>
+                                    </stackView>
                                 </subviews>
                             </stackView>
                         </subviews>
@@ -73,9 +99,11 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="container" destination="8NR-rJ-QZu" id="DHf-R8-U8o"/>
+                <outlet property="countView" destination="3WN-oi-hZ0" id="J19-Jt-oAT"/>
                 <outlet property="email" destination="5s7-e8-vkh" id="jIz-G0-Bi3"/>
                 <outlet property="message" destination="bgL-3a-9Gu" id="odJ-Q5-d5p"/>
-                <outlet property="time" destination="4UG-GB-SOR" id="jFx-JA-jfH"/>
+                <outlet property="time" destination="QW0-D7-tBl" id="VvI-WY-xA4"/>
+                <outlet property="unreadCountLabel" destination="f3m-uw-fhU" id="UdM-1x-r4w"/>
             </connections>
             <point key="canvasLocation" x="300.76335877862596" y="45.774647887323944"/>
         </tableViewCell>

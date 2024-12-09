@@ -18,6 +18,33 @@ class ChatVC: UIViewController {
     var messages = [MessageModel]()
     var senderId = getEmail()
     var senderName = UserDefaultsManager.shared.getEmail()
+    var unreadCountListener: ListenerRegistration?
+    var recipientID = UserDefaultsManager.shared.getEmail()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        tableView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.size.width - 10)
+        self.chatContainer.dropShadow()
+       
+        self.setTableView()
+        self.setNameAndTitle()
+        self.getMessages()
+        
+        print("chatId === ",chatID)
+        checkOrCreateChatDocument { success in
+               if success {
+                   print("Chat document is ready.")
+               } else {
+                   print("Failed to prepare chat document.")
+               }
+           }
+        
+        self.observeUnreadCount()
+        
+        let userEmail = UserDefaultsManager.shared.getEmail()
+        resetUnreadCount(for: userEmail)
+    }
     
     func shortMessages() {
         messages = messages.sorted(by: {
@@ -47,63 +74,14 @@ class ChatVC: UIViewController {
                 self.messages = messages
                 self.shortMessages()
                 self.reloadData()
-                
             }
         }
     }
 
-    func setupMessageListener() {
-            let chatDbRef = FireStoreManager.shared.db.collection("Chat").document(chatID).collection("Messages")
-            
-            // Listen for new messages
-            chatDbRef.order(by: "dateSent", descending: false).addSnapshotListener { [weak self] snapshot, error in
-                guard let self = self else { return }
-                
-                if let error = error {
-                    print("Error listening for new messages: \(error)")
-                    return
-                }
-                
-                guard let snapshot = snapshot else { return }
-                
-                // Loop through document changes
-                for diff in snapshot.documentChanges {
-                    if diff.type == .added {
-                        // Create a MessageModel from the new message data
-                        let messageData = diff.document.data()
-                        let newMessage = MessageModel(data: messageData)
-                        
-                        // Add the new message to the messages array
-                        self.messages.append(newMessage)
-                        self.shortMessages()
-                        self.reloadData()
-                        
-                        // Display local notification if message is from another user
-                        if newMessage.sender != self.senderId {
-                            self.displayLocalNotification(for: newMessage)
-                        }
-                    }
-                }
-            }
-        }
 
-        func displayLocalNotification(for message: MessageModel) {
-            let content = UNMutableNotificationContent()
-            content.title = "New message from \(message.senderName)"
-            content.body = message.text
-            content.sound = .default
-
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
-            
-            UNUserNotificationCenter.current().add(request) { error in
-                if let error = error {
-                    print("Error displaying local notification: \(error)")
-                }
-            }
-        }
-
- 
-  
+    deinit {
+        unreadCountListener?.remove()
+    }
 
 }
 
@@ -140,13 +118,9 @@ extension ChatVC {
      
         FireStoreManager.shared.saveChat(userEmail: getEmail().lowercased(), text:text, time: getTime(), chatID: chatID)
         
-      
-       // self.getMessages()
-       // self.tableView.reloadData()
+        incrementUnreadCount()
  
     }
-    
-    
 }
 
 
@@ -182,26 +156,6 @@ extension ChatVC: UITableViewDelegate, UITableViewDataSource {
 
 import UIKit
 extension ChatVC {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        tableView.scrollIndicatorInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.size.width - 10)
-        self.chatContainer.dropShadow()
-        
-        
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-                    if let error = error {
-                        print("Notification permission error: \(error)")
-                    }
-                }
-
-                // Set up the message listener
-                setupMessageListener()
-       
-        self.setTableView()
-        self.setNameAndTitle()
-        self.getMessages()
-    }
 
     
     func setNameAndTitle() {
@@ -221,12 +175,105 @@ extension ChatVC {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = true
+        let userEmail = UserDefaultsManager.shared.getEmail()
+        resetUnreadCount(for: userEmail)
+        
     }
     
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        let userEmail = UserDefaultsManager.shared.getEmail()
+        resetUnreadCount(for: userEmail)
+
+    }
     
-   
     
+    func observeUnreadCount() {
+        let chatRef = Firestore.firestore().collection("Chat").document(chatID)
+        unreadCountListener = chatRef.addSnapshotListener { (documentSnapshot, error) in
+            if let error = error {
+                print("Error observing unread count: \(error)")
+                return
+            }
+
+            if let data = documentSnapshot?.data(),
+               let unreadCount = data["unreadCount"] as? [String: Int],
+               let count = unreadCount[self.senderId] {
+                print("Unread count for this chat: \(count)")
+                // Update the UI to show unread count if needed
+            }
+        }
+    }
+
+    func incrementUnreadCount() {
+        checkOrCreateChatDocument { success in
+            guard success else { return }
+                
+                let senderEmail = UserDefaultsManager.shared.getEmail()
+                
+            let recipientEmail = self.chatID.replacingOccurrences(of: senderEmail, with: "")
+                
+                // Ensure recipient email is valid
+                guard recipientEmail != senderEmail else {
+                    print("Recipient email is the same as sender email")
+                    return
+                }
+
+            let chatRef = Firestore.firestore().collection("Chat").document(self.chatID)
+                
+                // Increment the unread count for the recipient
+                chatRef.updateData([
+                    "unreadCount.\(recipientEmail)": FieldValue.increment(Int64(1))
+                ]) { error in
+                    if let error = error {
+                        print("Error incrementing unread count for \(recipientEmail): \(error)")
+                    }
+                }
+            }
+    }
+
+
+
+    func resetUnreadCount(for senderEmail: String) {
+        checkOrCreateChatDocument { success in
+            guard success else { return }
+            let chatRef = Firestore.firestore().collection("Chat").document(self.chatID)
+                 chatRef.updateData([
+                     "unreadCount.\(senderEmail)": 0
+                 ]) { error in
+                     if let error = error {
+                         print("Error resetting unread count: \(error)")
+                     } else {
+                         print("Unread count reset successfully for \(senderEmail)")
+                     }
+                 }
+             }
+    }
+
+
+    func checkOrCreateChatDocument(completion: @escaping (Bool) -> Void) {
+        let chatRef = Firestore.firestore().collection("Chat").document(chatID)
+        chatRef.getDocument { document, error in
+            if let document = document, document.exists {
+                // Document exists, proceed with updates
+                completion(true)
+            } else {
+                // Document does not exist, create it with initial data
+                chatRef.setData(["unreadCount": [self.senderId: 0]]) { error in
+                    if let error = error {
+                        print("Error creating chat document: \(error)")
+                        completion(false)
+                    } else {
+                        print("Chat document created successfully")
+                        completion(true)
+                    }
+                }
+            }
+        }
+    }
+
+ 
     func registerCells() {
         self.tableView.register(UINib(nibName: "CometChatSenderTextMessageBubble", bundle: nil), forCellReuseIdentifier: "CometChatSenderTextMessageBubble")
         self.tableView.register(UINib(nibName: "CometChatReceiverTextMessageBubble", bundle: nil), forCellReuseIdentifier: "CometChatReceiverTextMessageBubble")
@@ -273,7 +320,6 @@ struct MessageModel {
     var chatId: String
     var text: String
     var senderName: String
-    //var isRead: Bool
     
     // Add an initializer to create a MessageModel from Firestore data
     init(data: [String: Any]) {
@@ -283,7 +329,7 @@ struct MessageModel {
         self.text = data["text"] as? String ?? ""
         self.senderName = data["senderName"] as? String ?? ""
     }
-
+    
     func getDate() -> Date {
         Date(timeIntervalSince1970: dateSent)
     }
@@ -300,97 +346,68 @@ struct MessageModel {
 
 extension FireStoreManager {
     
+   
     
+      func saveChat(userEmail:String, text:String,time:Double,chatID:String){
+          
+         let chatDbRef = self.db.collection("Chat")
+         let lastMessages = self.db.collection("LastMessages")
+          
+          let sender = UserDefaultsManager.shared.getEmail()
+          let senderName = UserDefaultsManager.shared.getEmail()
+          
+          let data = ["senderName" : senderName,"sender": sender,"messageType":1,"dateSent":time,"chatId":chatID,"text" : text] as [String : Any]
+          
+          let messagesCollection = chatDbRef.document(chatID).collection("Messages")
+          messagesCollection.addDocument(data: data)
+          
+          lastMessages.document(chatID).setData(data)
+          
+      }
+      
+      func getLatestMessages(chatID: String, completionHandler: @escaping ([QueryDocumentSnapshot]?, Error?) -> Void) {
+          let chatDbRef = self.db.collection("Chat")
+          let messagesCollection = chatDbRef.document(chatID).collection("Messages")
+          
+          // Query the last 1000 messages
+          let query = messagesCollection.order(by: "dateSent", descending: true).limit(to: 1000)
+          
+          // Add a snapshot listener to the query
+          query.addSnapshotListener { (querySnapshot, error) in
+              if let error = error {
+                  print("Error fetching documents: \(error)")
+                  completionHandler(nil, error)
+                  return
+              }
+              
+              // Handle the snapshot data
+              let documents = querySnapshot?.documents
+              completionHandler(documents, nil)
+          }
+      }
+      
+      func getChatList(completionHandler: @escaping ([QueryDocumentSnapshot]?, Error?) -> Void) {
+          let lastMessages = self.db.collection("LastMessages")
+          let query = lastMessages.order(by: "dateSent", descending: true).limit(to: 1000)
+          
+          // Add a snapshot listener to the query
+          query.addSnapshotListener { (querySnapshot, error) in
+              if let error = error {
+                  print("Error fetching documents: \(error)")
+                  completionHandler(nil, error)
+                  return
+              }
+              
+              // Handle the snapshot data
+              let documents = querySnapshot?.documents
+              completionHandler(documents, nil)
+          }
+      }
     
-    func saveChat(userEmail:String, text:String,time:Double,chatID:String){
-        
-        let chatDbRef = self.db.collection("Chat")
-        let lastMessages = self.db.collection("LastMessages")
-        
-        let sender = UserDefaultsManager.shared.getEmail()
-        let senderName = UserDefaultsManager.shared.getEmail()
-        
-        let data = ["senderName" : senderName,"sender": sender,"messageType":1,"dateSent":time,"chatId":chatID,"text" : text] as [String : Any]
-        
-        let messagesCollection = chatDbRef.document(chatID).collection("Messages")
-        messagesCollection.addDocument(data: data)
-        
-        lastMessages.document(chatID).setData(data)
-        
-    }
-    
-    func getLatestMessages(chatID: String, completionHandler: @escaping ([QueryDocumentSnapshot]?, Error?) -> Void) {
-        let chatDbRef = self.db.collection("Chat")
-        let messagesCollection = chatDbRef.document(chatID).collection("Messages")
-        
-        // Query the last 1000 messages
-        let query = messagesCollection.order(by: "dateSent", descending: true).limit(to: 1000)
-        
-        // Add a snapshot listener to the query
-        query.addSnapshotListener { (querySnapshot, error) in
-            if let error = error {
-                print("Error fetching documents: \(error)")
-                completionHandler(nil, error)
-                return
-            }
-            
-            // Handle the snapshot data
-            let documents = querySnapshot?.documents
-            completionHandler(documents, nil)
-        }
-    }
-    
-//    func getChatList(completionHandler: @escaping ([QueryDocumentSnapshot]?, Error?) -> Void) {
-//        let lastMessages = self.db.collection("LastMessages")
-//        let query = lastMessages.order(by: "dateSent", descending: true).limit(to: 1000)
-//        
-//        // Add a snapshot listener to the query
-//        query.addSnapshotListener { (querySnapshot, error) in
-//            if let error = error {
-//                print("Error fetching documents: \(error)")
-//                completionHandler(nil, error)
-//                return
-//            }
-//            
-//            // Handle the snapshot data
-//            let documents = querySnapshot?.documents
-//            completionHandler(documents, nil)
-//        }
-//    }
-    
-
-    
-    
-    func getChatList(userEmail: String, completionHandler: @escaping ([QueryDocumentSnapshot]?, Error?) -> Void) {
-        
-        let lastMessages = self.db.collection("LastMessages")
-        
-        let query = lastMessages.order(by: "dateSent", descending: true).limit(to: 1000)
-        
-        // Add a snapshot listener to the query
-        query.addSnapshotListener { (querySnapshot, error) in
-            if let error = error {
-                print("Error fetching documents: \(error)")
-                completionHandler(nil, error)
-                return
-            }
-            
-            guard let documents = querySnapshot?.documents else {
-                print("No documents found")
-                completionHandler(nil, nil)
-                return
-            }
-            
-            let filteredDocuments = documents.filter { document in
-                document.documentID.contains(userEmail)
-            }
-            
-            completionHandler(filteredDocuments, nil)
-        }
-        
-    }
     
 }
+
+
  
 extension Double{
     func getTimeOnly() ->String {
@@ -473,7 +490,7 @@ extension ChatVC {
         self.navigationController?.popViewController(animated: true)
     }
 }
- 
+
 
 extension Date {
     var millisecondsSince1970:Int64 {
